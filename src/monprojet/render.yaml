@@ -1,1 +1,12 @@
-startCommand: gunicorn monprojet.monsite.wsgi:application --chdir src
+
+
+services:
+  - type: web
+    name: enviro-app
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn monsite.wsgi:application --chdir src/monprojet
+    preDeployCommand: python manage.py migrate
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: monsite.settings
