@@ -7,12 +7,19 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+# Installe les dépendances système, y compris le client PostgreSQL
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
+    postgresql-client \
+    && apt-get clean
 # Crée un dossier de travail dans le conteneur
 WORKDIR /app
 
 # Copie et installe les dépendances Python
 COPY requirements.txt /app/
 RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install psycopg2-binary
 
 # Copie tout le code dans le conteneur
 COPY . /app/

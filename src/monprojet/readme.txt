@@ -15,3 +15,27 @@ exemple:  PS C:\Users\keita\OneDrive\Documents\GitHub\portail-envirosense\src\mo
 
 ensuite tu vas cliquer sur le lien qui va etre générer dans le message pour voir tes modification dans le website:
  http://127.0.0.1:8000/
+
+ PostgreSQL:
+ https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
+
+ lier postgreSQL avec le projet :
+ CHOISISSEZ postgreSQL 15 ET MODIFIEZ CES PARAMETRES :
+                                                    Host name:localhost
+                                                    PORT 5455
+ une fois postgreSQL est installer creer un nouveau user en bas a guache "Login/Group Roles"
+ avec les specifications suivantes:Name->envirosense_user
+                                  PASSWORD->envirosense_pass
+ajoutez database avec les proprietes suivantes :
+                                                Database :envirosense_db
+                                                OWNER:envirosense_user
+
+sur visual studio:
+ docker-compose build
+ docker-compose up -d
+ docker compose exec web bash
+ python manage.py makemigrations
+ python manage.py migrate
+
+
+
