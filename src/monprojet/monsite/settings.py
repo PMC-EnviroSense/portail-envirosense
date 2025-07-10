@@ -62,6 +62,20 @@ DATABASES = {
     }
 }
 
+
+# Database (Postgresql)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'envirosense_db',
+        'USER': 'envirosense_user',
+        'PASSWORD': 'envirosense_pass',
+        'HOST': 'db',  # correspond au nom du service dans docker-compose
+        'PORT': '5432',
+    }
+}
+
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
