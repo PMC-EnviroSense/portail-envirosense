@@ -22,7 +22,7 @@ ensuite tu vas cliquer sur le lien qui va etre générer dans le message pour vo
  lier postgreSQL avec le projet :
  CHOISISSEZ postgreSQL 15 ET MODIFIEZ CES PARAMETRES :
                                                     Host name:localhost
-                                                    PORT 5455
+                                                    PORT 5444
  une fois postgreSQL est installer creer un nouveau user en bas a guache "Login/Group Roles"
  avec les specifications suivantes:Name->envirosense_user
                                   PASSWORD->envirosense_pass
