@@ -12,14 +12,15 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     gcc \
     postgresql-client \
-    && apt-get clean
+    && apt-get clean  && rm -rf /var/lib/apt/lists/*
 # Crée un dossier de travail dans le conteneur
 WORKDIR /app
 
 # Copie et installe les dépendances Python
 COPY requirements.txt /app/
+
 RUN pip install --upgrade pip && pip install -r requirements.txt
-RUN pip install psycopg2-binary
+
 
 # Copie tout le code dans le conteneur
 COPY . /app/

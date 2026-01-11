@@ -1,5 +1,7 @@
 from pathlib import Path
 import os
+import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 # Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,6 +15,15 @@ ALLOWED_HOSTS = ['*']
 # Static files for Render
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATIC_URL = 'static/'
+
+
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ImproperlyConfigured("DATABASE_URL is not set. PostgreSQL is required.")
+
+DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
+
 
 # Installed apps
 INSTALLED_APPS = [
@@ -54,26 +65,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'monsite.wsgi.application'
 
-# Database (SQLite)
-#DATABASES = {
-#   'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#       'NAME': BASE_DIR / 'db.sqlite3',  
-#    }
-#}
-
-
-# Database (Postgresql)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'envirosense_db',
-        'USER': 'envirosense_user',
-        'PASSWORD': 'envirosense_pass',
-        'HOST': 'db',  # correspond au nom du service dans docker-compose
-        'PORT': '5432',
-    }
-}
 
 
 # Password validation
@@ -91,5 +82,6 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = '/home/'  
 

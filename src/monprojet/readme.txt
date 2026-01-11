@@ -37,5 +37,5 @@ sur visual studio:
  python manage.py makemigrations
  python manage.py migrate
 
-
+render :
 
