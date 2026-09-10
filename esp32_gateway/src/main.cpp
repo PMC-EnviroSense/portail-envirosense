@@ -4,6 +4,7 @@
 
 HardwareSerial STMSerial(1);
 
+/*
 // ===== WIFI =====
 const char* WIFI_SSID = "TON_WIFI";
 const char* WIFI_PASSWORD = "TON_MOT_DE_PASSE_WIFI";
@@ -174,4 +175,74 @@ void loop() {
       uartLine += c;
     }
   }
+}
+
+*/
+// ===== WIFI =====
+// Mets ici le nom EXACT du Wi-Fi public
+const char* WIFI_SSID = "UdeS-Public";
+
+void connectWiFi() {
+  Serial.println();
+  Serial.println("=== TEST WIFI ESP32-S3 ===");
+
+  WiFi.mode(WIFI_STA);
+
+  Serial.print("Connexion au WiFi : ");
+  Serial.println(WIFI_SSID);
+
+  // WiFi sans mot de passe
+  WiFi.begin(WIFI_SSID);
+
+  unsigned long startTime = millis();
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+
+    // Timeout après 20 secondes
+    if (millis() - startTime > 20000) {
+      Serial.println();
+      Serial.println("Echec de connexion WiFi");
+      Serial.print("Statut WiFi : ");
+      Serial.println(WiFi.status());
+      return;
+    }
+  }
+
+  Serial.println();
+  Serial.println("WiFi connecte !");
+  Serial.print("Adresse IP : ");
+  Serial.println(WiFi.localIP());
+
+  Serial.print("RSSI : ");
+  Serial.print(WiFi.RSSI());
+  Serial.println(" dBm");
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  delay(2000);
+
+  Serial.println();
+  Serial.println("ESP32 READY");
+
+  connectWiFi();
+}
+void loop() {
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.print("WiFi OK | IP : ");
+    Serial.print(WiFi.localIP());
+
+    Serial.print(" | RSSI : ");
+    Serial.print(WiFi.RSSI());
+
+    Serial.println(" dBm");
+  }
+  else {
+    Serial.println("WiFi non connecte");
+  }
+
+  delay(5000);
 }
