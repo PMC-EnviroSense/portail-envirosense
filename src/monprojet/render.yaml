@@ -4,7 +4,7 @@ services:
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn monsite.wsgi:application --chdir src/monprojet
-    preDeployCommand: python manage.py migrate
+    preDeployCommand: cd src/monprojet && python manage.py migrate
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: monsite.settings   

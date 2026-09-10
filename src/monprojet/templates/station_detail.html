@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Station {{ station.id_stat }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f6f8;
+            color: #1f2937;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .topbar a {
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .station-header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .station-header h1 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .station-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .meta-box {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .meta-box strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #374151;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .actions form,
+        .actions .csv-link {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .actions input,
+        .actions button {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+        }
+
+        .actions button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .actions button:hover {
+            background: #1d4ed8;
+        }
+
+        .csv-link a {
+            text-decoration: none;
+            color: white;
+            background: #059669;
+            padding: 10px 14px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .csv-link a:hover {
+            background: #047857;
+        }
+
+        .section-title {
+            margin: 30px 0 15px;
+        }
+
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .sensor-card {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .sensor-card h3 {
+            margin: 0 0 12px;
+            font-size: 18px;
+        }
+
+        .sensor-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+
+        .sensor-info {
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        .table-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 12px;
+            text-align: center;
+        }
+
+        table th {
+            background: #f9fafb;
+        }
+
+        .empty-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            color: #6b7280;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+
+        <div class="topbar">
+            <h1>Détail station</h1>
+            <a href="{% url 'home' %}">← Retour</a>
+        </div>
+
+        <div class="station-header">
+            <h1>Station {{ station.id_stat }}</h1>
+
+            <div class="station-meta">
+                <div class="meta-box">
+                    <strong>Dernière communication</strong>
+                    {{ station.last_timestamp|default:"---" }}
+                </div>
+
+                <div class="meta-box">
+                    <strong>Position</strong>
+                    {{ station.last_position|default:"---" }}
+                </div>
+
+                <div class="meta-box">
+                    <strong>LoRa</strong>
+                    {% if station.is_Lora %}Actif{% else %}Inactif{% endif %}
+                </div>
+
+                <div class="meta-box">
+                    <strong>Wi-Fi</strong>
+                    {% if station.is_Wifi %}Actif{% else %}Inactif{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <form method="post" action="{% url 'set_interval' station.id_stat %}">
+                {% csrf_token %}
+                <label for="interval"><strong>Fréquence de mesure (secondes)</strong></label><br><br>
+                <input type="number" name="interval" id="interval" min="1" required>
+                <button type="submit">Appliquer</button>
+            </form>
+
+            <div class="csv-link">
+                <strong>Téléchargement</strong><br><br>
+                <a href="{% url 'export_station_csv' station.id_stat %}">Download CSV</a>
+            </div>
+        </div>
+
+        <h2 class="section-title">Capteurs actifs</h2>
+
+        {% if sensors %}
+        <div class="sensor-grid">
+            {% for sensor in sensors %}
+            <div class="sensor-card">
+                <h3>{{ sensor.name }}</h3>
+                <div class="sensor-value">
+                    {{ sensor.last_value|default:"---" }} {{ sensor.unit|default:"" }}
+                </div>
+                <div class="sensor-info">
+                    <div><strong>ID capteur :</strong> {{ sensor.id_sens }}</div>
+                    <div><strong>Type :</strong> {{ sensor.type|default:"---" }}</div>
+                    <div><strong>Dernier timestamp :</strong> {{ sensor.last_timestamp|default:"---" }}</div>
+                    <div><strong>Fréquence :</strong> {{ sensor.freq|default:"---" }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-box">Aucun capteur trouvé pour cette station.</div>
+        {% endif %}
+
+        <h2 class="section-title">Historique des données</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Capteur</th>
+                        <th>Valeur</th>
+                        <th>Unité</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data_rows %}
+                    <tr>
+                        <td>{{ row.timestamp }}</td>
+                        <td>{{ row.sensor.name }}</td>
+                        <td>{{ row.value }}</td>
+                        <td>{{ row.sensor.unit }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">Aucune donnée reçue</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</body>
+</html>

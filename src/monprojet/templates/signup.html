@@ -2,17 +2,252 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Inscription - EnviroSense</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+
+      /* 🌿 FOND VERT DÉGRADÉ */
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    }
+
+    .signup-wrapper {
+      width: 100%;
+      max-width: 460px;
+      padding: 20px;
+    }
+
+    .signup-card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 24px;
+      padding: 36px 32px 28px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .check-badge {
+      position: absolute;
+      top: 24px;
+      right: -18px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #10c500;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 30px;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(16, 197, 0, 0.25);
+    }
+
+    .title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0 0 28px 0;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #d9d9d9;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s ease;
+      background: #fff;
+    }
+
+    .form-input:focus {
+      border-color: #1696f2;
+      box-shadow: 0 0 0 3px rgba(22, 150, 242, 0.12);
+    }
+
+    .submit-btn {
+      width: 100%;
+      margin-top: 8px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #1696f2;
+      color: white;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .submit-btn:hover {
+      background: #0d7fd1;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 14px;
+      color: #777;
+    }
+
+    .login-link a {
+      color: #1696f2;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 24px 0 18px;
+      color: #999;
+      font-size: 14px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #ddd;
+    }
+
+    .google-btn {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #bbb;
+      border-radius: 8px;
+      background: white;
+      font-size: 15px;
+      cursor: not-allowed;
+      color: #333;
+    }
+
+    .field-error {
+      margin-top: 6px;
+      color: #d93025;
+      font-size: 13px;
+    }
+
+    /* 🔥 BULLE MOT DE PASSE */
+    .password-tooltip {
+      position: absolute;
+      top: 50%;
+      left: calc(100% + 14px);
+      transform: translateY(-50%);
+      width: 260px;
+      background: #ffffff;
+      border: 1px solid #f2b8b5;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.10);
+      padding: 12px 14px;
+      color: #d93025;
+      font-size: 13px;
+      display: none;
+      z-index: 20;
+    }
+
+    .password-tooltip.show {
+      display: block;
+    }
+
+    .password-tooltip::before {
+      content: "";
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-right: 8px solid #ffffff;
+    }
+
+    .password-tooltip ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .password-tooltip {
+        position: static;
+        transform: none;
+        width: 100%;
+        margin-top: 8px;
+      }
+
+      .password-tooltip::before {
+        display: none;
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Créer un compte</h1>
+  <div class="signup-wrapper">
+    <div class="signup-card">
+      <div class="check-badge">✓</div>
 
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">S'inscrire</button>
-  </form>
+      <h1 class="title">Inscription</h1>
 
-  <p>Déjà un compte ? <a href="{% url 'login' %}">Se connecter</a></p>
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="form-group">
+          {{ form.username }}
+          {% if form.username.errors %}
+            <div class="field-error">{{ form.username.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="field-error">{{ form.email.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          {{ form.password1 }}
+
+          <div class="password-tooltip {% if form.password1.errors %}show{% endif %}">
+            {{ form.password1.errors }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          {{ form.password2 }}
+          {% if form.password2.errors %}
+            <div class="field-error">{{ form.password2.errors }}</div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="submit-btn">Inscription</button>
+      </form>
+
+      <div class="login-link">
+        Vous avez déja un compte ?
+        <a href="{% url 'login' %}">Connectez-vous</a>
+      </div>
+
+    </div>
+  </div>
 </body>
 </html>

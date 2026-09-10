@@ -1,39 +1,23 @@
 from pathlib import Path
 import os
 import dj_database_url
-from django.core.exceptions import ImproperlyConfigured
 
-# Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-#+p9iet-q76c@^lc!tnbi(z65$&+-1=l5nix0uofc#kn-%-ipl'
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key")
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-DEBUG = True
+ALLOWED_HOSTS = ["*"]
 
-ALLOWED_HOSTS = ['*']
-
-# Static files for Render
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATIC_URL = 'static/'
-
-
-
-DATABASE_URL = os.getenv("DATABASE_URL")
-if not DATABASE_URL:
-    raise ImproperlyConfigured("DATABASE_URL is not set. PostgreSQL is required.")
-
-DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
-
-
-# Installed apps
 INSTALLED_APPS = [
-    'capteurs.apps.CapteursConfig',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'capteurs.apps.CapteursConfig',
 ]
 
 MIDDLEWARE = [
@@ -51,7 +35,7 @@ ROOT_URLCONF = 'monsite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -65,9 +49,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'monsite.wsgi.application'
 
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
-
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -75,13 +69,22 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = 'fr-ca'
+TIME_ZONE = 'America/Montreal'
 USE_I18N = True
 USE_TZ = True
+
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = '/home/'  
+LOGIN_REDIRECT_URL = "/home/"
 
+MQTT_BROKER_HOST = os.getenv("MQTT_BROKER_HOST", "127.0.0.1")
+MQTT_BROKER_PORT = int(os.getenv("MQTT_BROKER_PORT", "1883"))
+MQTT_USERNAME = os.getenv("MQTT_USERNAME", "")
+MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "")
+
+TIME_ZONE = 'America/Montreal'
