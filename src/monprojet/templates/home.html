@@ -1,288 +1,982 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Accueil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <title>EnviroSense</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            display: flex;
-            min-height: 100vh;
-            background-color: #f2f2f2;
-        }
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
-        .content {
-            flex: 1;
-            padding: 30px;
-            margin-right: 220px;
-            box-sizing: border-box;
-        }
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-        .sidebar {
-            width: 200px;
-            background-color: #2c3e50;
-            padding: 20px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            position: fixed;
-            right: 0;
-            top: 0;
-            bottom: 0;
-        }
-
-        .sidebar button {
-            background-color: #34495e;
-            color: white;
-            border: none;
-            padding: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            width: 100%;
-        }
-
-        .sidebar button:hover {
-            background-color: #1abc9c;
-        }
-
-        .sidebar form button {
-            background-color: #34495e;
-            color: white;
-            border: none;
-            padding: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            width: 100%;
-        }
-
-        .sidebar form button.logout-btn {
-            background-color: #e74c3c;
-        }
-
-        .sidebar form button.logout-btn:hover {
-            background-color: #c0392b;
-        }
-
-        .section {
-            display: none;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        #map {
-            height: 400px;
-            margin-top: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            background: #ddd;
-        }
-
-        .dashboard-box {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-
-        .kpi-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .kpi-card {
-            background: white;
-            border-radius: 12px;
-            padding: 18px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-
-        .kpi-card h3 {
-            margin: 0 0 10px;
-            font-size: 16px;
-            color: #374151;
-        }
-
-        .kpi-card p {
-            margin: 0;
-            font-size: 24px;
-            font-weight: bold;
-            color: #111827;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: white;
-        }
-
-        table, th, td {
-            border: 1px solid #aaa;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-
-        a {
-            color: #2c3e50;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet"
+          href="{% static 'CSS/envirosense.css' %}">
 </head>
 
 <body>
 
-    <div class="content">
+<!-- =========================================================
+     BARRE LATÉRALE
+========================================================= -->
+<aside class="sidebar">
 
-        <!-- DASHBOARD -->
-        <div id="dashboard" class="section active">
-            <div class="dashboard-box">
-                <h2>Vue globale des stations</h2>
-                <div id="map"></div>
+    <div class="sidebar-brand">
+        <div class="brand-title">
+            <i class="fa-solid fa-leaf"></i>
+            <span>Enviro<span class="brand-green">Sense</span></span>
+        </div>
+
+        <p>
+            Supervision des stations<br>
+            environnementales
+        </p>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <button
+            type="button"
+            class="nav-item active"
+            data-section="dashboard"
+            onclick="showSection('dashboard', this)"
+        >
+            <i class="fa-solid fa-house"></i>
+            <span>Tableau de bord</span>
+        </button>
+
+        <button
+            type="button"
+            class="nav-item"
+            data-section="stations"
+            onclick="showSection('stations', this)"
+        >
+            <i class="fa-solid fa-location-dot"></i>
+            <span>Stations</span>
+        </button>
+
+        <button
+            type="button"
+            class="nav-item"
+            data-section="informations"
+            onclick="showSection('informations', this)"
+        >
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Informations</span>
+        </button>
+
+    </nav>
+
+    <form action="{% url 'logout' %}" method="post" class="logout-form">
+        {% csrf_token %}
+
+        <button type="submit" class="logout-btn">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>Se déconnecter</span>
+        </button>
+    </form>
+
+</aside>
+
+
+<!-- =========================================================
+     CONTENU
+========================================================= -->
+<main class="main-content">
+
+
+    <!-- =====================================================
+         DASHBOARD
+    ====================================================== -->
+    <section id="dashboard" class="page-section active">
+
+        <header class="page-header">
+            <h1>Tableau de bord</h1>
+            <p>Vue globale des stations environnementales</p>
+        </header>
+
+
+        <!-- CARTE -->
+        <div class="card map-card">
+
+            <div class="card-heading">
+                <div>
+                    <h2>Localisation des stations</h2>
+                    <p>Position et état actuel du réseau</p>
+                </div>
+
+                <div class="map-legend">
+                    <span>
+                        <span class="legend-dot online"></span>
+                        Station en ligne
+                    </span>
+
+                    <span>
+                        <span class="legend-dot offline"></span>
+                        Station hors ligne
+                    </span>
+                </div>
             </div>
 
-            <div class="kpi-row">
-    <div class="kpi-card">
-        <h3>Nombre de stations</h3>
-        <p>{{ rows|length }}</p>
-    </div>
+            <div id="map"></div>
 
-    <div class="kpi-card">
-        <h3>Stations en ligne</h3>
-        <p>{{ online_count }}</p>
-    </div>
-
-    <div class="kpi-card">
-        <h3>Stations hors ligne</h3>
-        <p>{{ offline_count }}</p>
-    </div>
-</div>
         </div>
 
-        <!-- STATIONS -->
-        <div id="stations" class="section">
-            <h2>Stations</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nom station</th>
-                        <th>Statut</th>
-                        <th>Dernière donnée</th>
-                        <th>Nombre de capteurs</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
+
+        <!-- KPI -->
+        <div class="kpi-grid">
+
+            <div class="kpi-card kpi-blue">
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-tower-broadcast"></i>
+                </div>
+
+                <div class="kpi-content">
+                    <span>Nombre de stations</span>
+                    <strong>{{ rows|length }}</strong>
+                </div>
+            </div>
+
+
+            <div class="kpi-card kpi-green">
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div class="kpi-content">
+                    <span>Stations en ligne</span>
+                    <strong>{{ online_count }}</strong>
+                </div>
+            </div>
+
+
+            <div class="kpi-card kpi-red">
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+
+                <div class="kpi-content">
+                    <span>Stations hors ligne</span>
+                    <strong>{{ offline_count }}</strong>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ÉTAT DU RÉSEAU -->
+        <div class="card network-card">
+
+            <div class="card-heading">
+                <div>
+                    <h2>État du réseau</h2>
+                    <p>Dernière communication des stations</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="text-link"
+                    onclick="openStationsPage()"
+                >
+                    Voir toutes les stations
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="stations-table">
+
+                    <thead>
+                        <tr>
+                            <th>Station</th>
+                            <th>Statut</th>
+                            <th>Dernière communication</th>
+                            <th>Position</th>
+                            <th>Rôle</th>
+                            <th>Nombre de capteurs</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
                     {% for row in rows %}
-                    <tr>
-                        <td>{{ row.station.id_stat }}</td>
-                        <td>{{ row.status }}</td>
-                        <td>{{ row.last_data|date:"d F Y, H:i:s"|default:"---" }}</td>
-                        <td>{{ row.sensor_count }}</td>
-                        <td>
-                            <a href="{% url 'station_detail' row.station.id_stat %}">Voir station</a>
-                        </td>
-                    </tr>
+
+                        <tr>
+
+                            <td>
+                                <div class="station-name">
+                                    <div class="station-icon">
+                                        <i class="fa-solid fa-tower-broadcast"></i>
+                                    </div>
+
+                                    <strong>
+                                        Station {{ row.station.id_stat }}
+                                    </strong>
+                                </div>
+                            </td>
+
+
+                            <td>
+                                {% if row.is_online %}
+                                    <span class="status-badge status-online">
+                                        <span></span>
+                                        En ligne
+                                    </span>
+                                {% else %}
+                                    <span class="status-badge status-offline">
+                                        <span></span>
+                                        Hors ligne
+                                    </span>
+                                {% endif %}
+                            </td>
+
+
+                            <td>
+                                {% if row.last_data %}
+                                    {{ row.last_data|date:"d/m/Y H:i:s" }}
+                                {% else %}
+                                    <span class="muted">Aucune donnée</span>
+                                {% endif %}
+                            </td>
+
+
+                            <td>
+                                {% if row.station.latitude != None and row.station.longitude != None %}
+
+                                    <div class="position-value">
+                                        <i class="fa-solid fa-location-dot"></i>
+
+                                        <span>
+                                            {{ row.station.latitude|floatformat:5 }},
+                                            {{ row.station.longitude|floatformat:5 }}
+                                        </span>
+                                    </div>
+
+                                {% else %}
+                                    <span class="muted">Non disponible</span>
+                                {% endif %}
+                            </td>
+
+
+                            <td>
+                                <span class="role-badge role-{{ row.station.role }}">
+                                    {{ row.station.get_role_display }}
+                                </span>
+                            </td>
+
+
+                            <td>
+                                {{ row.sensor_count }}
+                            </td>
+
+
+                            <td>
+                                <a
+                                    href="{% url 'station_detail' row.station.id_stat %}"
+                                    class="station-link"
+                                >
+                                    Voir station
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </td>
+
+                        </tr>
+
                     {% empty %}
-                    <tr>
-                        <td colspan="5">Aucune station disponible</td>
-                    </tr>
+
+                        <tr>
+                            <td colspan="7" class="empty-table">
+                                Aucune station disponible.
+                            </td>
+                        </tr>
+
                     {% endfor %}
-                </tbody>
-            </table>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
         </div>
 
-        <!-- INFORMATIONS -->
-        <div id="informations" class="section">
-            <h2>Informations</h2>
-            <p>Ce site est alimenté par un réseau de capteurs.</p>
-            <p>Veuillez écrire à <strong>EnviroSense</strong> pour plus d’informations.</p>
+    </section>
+
+
+
+    <!-- =====================================================
+         STATIONS
+    ====================================================== -->
+    <section id="stations" class="page-section">
+
+        <header class="page-header">
+            <h1>Stations</h1>
+            <p>Liste et état des stations environnementales</p>
+        </header>
+
+
+        <div class="kpi-grid">
+
+            <div class="kpi-card kpi-blue">
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-tower-broadcast"></i>
+                </div>
+
+                <div class="kpi-content">
+                    <span>Nombre de stations</span>
+                    <strong>{{ rows|length }}</strong>
+                </div>
+            </div>
+
+
+            <div class="kpi-card kpi-green">
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div class="kpi-content">
+                    <span>Stations en ligne</span>
+                    <strong>{{ online_count }}</strong>
+                </div>
+            </div>
+
+
+            <div class="kpi-card kpi-red">
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+
+                <div class="kpi-content">
+                    <span>Stations hors ligne</span>
+                    <strong>{{ offline_count }}</strong>
+                </div>
+            </div>
+
         </div>
 
-    </div>
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <button type="button" onclick="showSection('dashboard')">Dashboard</button>
-        <button type="button" onclick="showSection('stations')">Stations</button>
-        <button type="button" onclick="showSection('informations')">Informations</button>
+        <div class="card station-list-card">
 
-        <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="logout-btn">Se déconnecter</button>
-        </form>
-    </div>
+            <div class="card-heading station-list-heading">
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+                <div>
+                    <h2>Liste des stations</h2>
+                    <p>Consultez les stations enregistrées dans le système</p>
+                </div>
+
+
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        id="stationSearch"
+                        placeholder="Rechercher une station..."
+                        onkeyup="filterStations()"
+                    >
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="stations-table" id="stationTable">
+
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Statut</th>
+                            <th>Dernière communication</th>
+                            <th>Position</th>
+                            <th>Nombre de capteurs</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+
+                    {% for row in rows %}
+
+                        <tr>
+
+                            <td>
+                                <div class="station-name">
+
+                                    <div class="station-icon">
+                                        <i class="fa-solid fa-tower-broadcast"></i>
+                                    </div>
+
+                                    <div>
+                                        <strong>
+                                            Station {{ row.station.id_stat }}
+                                        </strong>
+
+                                        <small>
+                                            {{ row.station.get_role_display }}
+                                        </small>
+                                    </div>
+
+                                </div>
+                            </td>
+
+
+                            <td>
+                                {% if row.is_online %}
+
+                                    <span class="status-badge status-online">
+                                        <span></span>
+                                        En ligne
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-offline">
+                                        <span></span>
+                                        Hors ligne
+                                    </span>
+
+                                {% endif %}
+                            </td>
+
+
+                            <td>
+                                {% if row.last_data %}
+                                    {{ row.last_data|date:"d/m/Y H:i:s" }}
+                                {% else %}
+                                    <span class="muted">Aucune donnée</span>
+                                {% endif %}
+                            </td>
+
+
+                            <td>
+                                {% if row.station.latitude != None and row.station.longitude != None %}
+
+                                    <div class="position-cell">
+
+                                        <span>
+                                            {{ row.station.latitude|floatformat:5 }},
+                                            {{ row.station.longitude|floatformat:5 }}
+                                        </span>
+
+                                        <button
+                                            type="button"
+                                            class="map-link"
+                                            onclick="showStationOnMap(
+                                                {{ row.station.latitude }},
+                                                {{ row.station.longitude }}
+                                            )"
+                                        >
+                                            Voir sur la carte
+                                        </button>
+
+                                    </div>
+
+                                {% else %}
+
+                                    <span class="muted">
+                                        Non disponible
+                                    </span>
+
+                                {% endif %}
+                            </td>
+
+
+                            <td>
+                                {{ row.sensor_count }}
+                            </td>
+
+
+                            <td>
+                                <a
+                                    href="{% url 'station_detail' row.station.id_stat %}"
+                                    class="station-link"
+                                >
+                                    Voir station
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+                            <td colspan="6" class="empty-table">
+                                Aucune station disponible.
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         INFORMATIONS
+    ====================================================== -->
+    <section id="informations" class="page-section">
+
+        <header class="page-header">
+            <h1>Informations</h1>
+            <p>À propos du système EnviroSense</p>
+        </header>
+
+
+        <!-- INTRODUCTION -->
+        <div class="info-hero">
+
+            <div class="info-hero-text">
+
+                <div class="info-logo">
+                    <i class="fa-solid fa-leaf"></i>
+
+                    <span>
+                        Enviro<span>Sense</span>
+                    </span>
+                </div>
+
+                <h2>
+                    Surveillance environnementale intelligente
+                </h2>
+
+                <p>
+                    EnviroSense est un système de stations environnementales
+                    permettant de collecter, transmettre et visualiser des
+                    données provenant de différents capteurs déployés sur le
+                    terrain.
+                </p>
+
+                <p>
+                    Le portail permet de suivre l'état des stations,
+                    leur position ainsi que les données environnementales
+                    reçues.
+                </p>
+
+            </div>
+
+
+            <div class="info-hero-image">
+                <div class="hero-pattern">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <div class="information-grid">
+
+
+            <!-- DONNÉES COLLECTÉES -->
+            <article class="information-card info-blue">
+
+                <div class="information-icon">
+                    <i class="fa-solid fa-temperature-half"></i>
+                </div>
+
+                <div>
+                    <h2>Données collectées</h2>
+
+                    <p>
+                        Les stations peuvent recueillir différentes mesures
+                        environnementales :
+                    </p>
+
+                    <ul>
+                        <li>Température de l'air</li>
+                        <li>Humidité relative</li>
+                        <li>Pression atmosphérique</li>
+                        <li>Position géographique (latitude et longitude)</li>
+                        <li>Autres capteurs selon les besoins</li>
+                    </ul>
+                </div>
+
+            </article>
+
+
+
+            <!-- TRANSMISSION -->
+            <article class="information-card info-green">
+
+                <div class="information-icon">
+                    <i class="fa-solid fa-tower-broadcast"></i>
+                </div>
+
+                <div>
+                    <h2>Transmission des données</h2>
+
+                    <p>
+                        Les stations utilisent différents moyens de
+                        communication afin d'acheminer leurs données.
+                    </p>
+
+                    <div class="info-sub-block">
+                        <strong>LoRa</strong>
+                        <span>
+                            Communication longue portée entre les stations
+                            déployées sur le terrain.
+                        </span>
+                    </div>
+
+                    <div class="info-sub-block">
+                        <strong>Wi-Fi</strong>
+                        <span>
+                            Transmission des données vers l'infrastructure
+                            réseau lorsque la connexion est disponible.
+                        </span>
+                    </div>
+                </div>
+
+            </article>
+
+
+
+            <!-- RÔLES -->
+            <article class="information-card info-purple">
+
+                <div class="information-icon">
+                    <i class="fa-solid fa-network-wired"></i>
+                </div>
+
+                <div>
+                    <h2>Rôles des stations</h2>
+
+                    <div class="role-description">
+
+                        <div>
+                            <strong>Station de liaison</strong>
+                            <p>
+                                Assure la communication entre le réseau de
+                                stations et l'infrastructure de supervision.
+                            </p>
+                        </div>
+
+                        <div>
+                            <strong>Station de collecte</strong>
+                            <p>
+                                Collecte les mesures des capteurs et les
+                                transmet à travers le réseau.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+            </article>
+
+
+
+            <!-- FONCTIONNEMENT -->
+            <article class="information-card info-orange">
+
+                <div class="information-icon">
+                    <i class="fa-solid fa-list-ol"></i>
+                </div>
+
+                <div>
+                    <h2>Fonctionnement du système</h2>
+
+                    <div class="steps">
+
+                        <div class="step">
+                            <span>1</span>
+                            <p>
+                                Les capteurs effectuent les mesures
+                                environnementales.
+                            </p>
+                        </div>
+
+                        <div class="step">
+                            <span>2</span>
+                            <p>
+                                La station de collecte prépare et transmet
+                                les données.
+                            </p>
+                        </div>
+
+                        <div class="step">
+                            <span>3</span>
+                            <p>
+                                Les données sont acheminées vers la station
+                                de liaison.
+                            </p>
+                        </div>
+
+                        <div class="step">
+                            <span>4</span>
+                            <p>
+                                Les informations sont enregistrées et
+                                affichées sur le portail EnviroSense.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+            </article>
+
+
+
+            <!-- ÉTAT -->
+            <article class="information-card info-status-card">
+
+                <div class="information-icon">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+
+                <div>
+                    <h2>État du système</h2>
+
+                    <p>
+                        Une station est considérée
+                        <strong>en ligne</strong> lorsqu'une communication
+                        récente a été reçue.
+                    </p>
+
+                    <p>
+                        Après plus de <strong>60 secondes</strong> sans
+                        nouvelle communication, elle est affichée
+                        <strong>hors ligne</strong> dans le portail.
+                    </p>
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+
+<!-- =========================================================
+     DONNÉES DJANGO POUR LA CARTE
+========================================================= -->
 {{ map_stations|json_script:"map-stations-data" }}
 
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
 <script>
-    function showSection(id) {
-        document.querySelectorAll('.section').forEach(function(sec) {
-            sec.classList.remove('active');
-        });
 
-        const target = document.getElementById(id);
-        if (target) {
-            target.classList.add('active');
-        }
+/* ============================================================
+   NAVIGATION
+============================================================ */
 
-        if (id === 'dashboard' && window.dashboardMap) {
-            setTimeout(function () {
-                window.dashboardMap.invalidateSize();
-            }, 100);
-        }
-    }
+function showSection(sectionId, button = null) {
 
-    const rawMapData = document.getElementById('map-stations-data');
-    const stationsData = rawMapData ? JSON.parse(rawMapData.textContent) : [];
-
-    const map = L.map('map').setView([45.5017, -73.5673], 6);
-    window.dashboardMap = map;
-
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 19,
-    attribution: 'Tiles &copy; Esri'
-}).addTo(map);
-
-    const bounds = [];
-
-    stationsData.forEach(function(station) {
-        if (station.lat !== null && station.lng !== null) {
-            const marker = L.marker([station.lat, station.lng]).addTo(map);
-
-            marker.bindPopup(`
-                <b>Station ${station.id}</b><br>
-                Statut: ${station.status}<br>
-                Latitude: ${station.lat}<br>
-                Longitude: ${station.lng}
-            `);
-
-            bounds.push([station.lat, station.lng]);
-        }
+    document.querySelectorAll(".page-section").forEach(section => {
+        section.classList.remove("active");
     });
 
-    if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [30, 30] });
+    const target = document.getElementById(sectionId);
+
+    if (target) {
+        target.classList.add("active");
     }
+
+    document.querySelectorAll(".nav-item").forEach(item => {
+        item.classList.remove("active");
+    });
+
+    if (button) {
+        button.classList.add("active");
+    } else {
+        const navButton = document.querySelector(
+            '.nav-item[data-section="' + sectionId + '"]'
+        );
+
+        if (navButton) {
+            navButton.classList.add("active");
+        }
+    }
+
+    if (sectionId === "dashboard" && window.dashboardMap) {
+        setTimeout(function () {
+            window.dashboardMap.invalidateSize();
+        }, 150);
+    }
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+function openStationsPage() {
+    showSection("stations");
+}
+
+
+/* ============================================================
+   RECHERCHE DES STATIONS
+============================================================ */
+
+function filterStations() {
+
+    const input = document.getElementById("stationSearch");
+    const filter = input.value.toLowerCase();
+
+    const table = document.getElementById("stationTable");
+
+    if (!table) {
+        return;
+    }
+
+    const rows = table.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+
+        const text = row.textContent.toLowerCase();
+
+        if (text.includes(filter)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+
+    });
+}
+
+
+/* ============================================================
+   CARTE
+============================================================ */
+
+const mapDataElement =
+    document.getElementById("map-stations-data");
+
+const stationsData =
+    mapDataElement
+        ? JSON.parse(mapDataElement.textContent)
+        : [];
+
+
+const map = L.map("map", {
+    zoomControl: true
+}).setView([45.40, -71.90], 10);
+
+window.dashboardMap = map;
+
+
+/* Vue satellite */
+L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    {
+        maxZoom: 19,
+        attribution: "Tiles &copy; Esri"
+    }
+).addTo(map);
+
+
+const bounds = [];
+
+
+/* Création d'un marqueur coloré */
+function createStationIcon(status) {
+
+    const online = status === "En ligne";
+
+    return L.divIcon({
+        className: "custom-map-marker",
+        html:
+            '<div class="map-marker ' +
+            (online ? "map-marker-online" : "map-marker-offline") +
+            '">' +
+                '<div class="map-marker-center"></div>' +
+            '</div>',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        popupAnchor: [0, -14]
+    });
+}
+
+
+stationsData.forEach(function(station) {
+
+    if (station.lat !== null && station.lng !== null) {
+
+        const marker = L.marker(
+            [station.lat, station.lng],
+            {
+                icon: createStationIcon(station.status)
+            }
+        ).addTo(map);
+
+
+        marker.bindPopup(
+            '<div class="station-popup">' +
+                '<strong>Station ' + station.id + '</strong>' +
+                '<span>' + station.role + '</span>' +
+                '<span>' + station.status + '</span>' +
+                '<small>' +
+                    Number(station.lat).toFixed(5) +
+                    ', ' +
+                    Number(station.lng).toFixed(5) +
+                '</small>' +
+            '</div>'
+        );
+
+
+        bounds.push([
+            station.lat,
+            station.lng
+        ]);
+    }
+});
+
+
+if (bounds.length > 0) {
+
+    map.fitBounds(bounds, {
+        padding: [60, 60],
+        maxZoom: 15
+    });
+
+}
+
+
+/* ============================================================
+   OUVRIR UNE POSITION DEPUIS LA PAGE STATIONS
+============================================================ */
+
+function showStationOnMap(lat, lng) {
+
+    showSection("dashboard");
+
+    setTimeout(function() {
+
+        map.invalidateSize();
+
+        map.setView(
+            [lat, lng],
+            16
+        );
+
+    }, 200);
+}
+
 </script>
 
 </body>

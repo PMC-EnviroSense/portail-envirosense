@@ -4,7 +4,7 @@
 
 HardwareSerial STMSerial(1);
 
-/*
+ NE TOUCHEZ PAS 
 // ===== WIFI =====
 const char* WIFI_SSID = "TON_WIFI";
 const char* WIFI_PASSWORD = "TON_MOT_DE_PASSE_WIFI";
@@ -177,7 +177,7 @@ void loop() {
   }
 }
 
-*/
+/*
 // ===== WIFI =====
 // Mets ici le nom EXACT du Wi-Fi public
 const char* WIFI_SSID = "UdeS-Public";
@@ -246,3 +246,5 @@ void loop() {
 
   delay(5000);
 }
+
+*/

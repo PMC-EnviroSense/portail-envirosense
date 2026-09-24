@@ -2,6 +2,16 @@ from django.db import models
 
 class Station(models.Model):
     id_stat = models.CharField(max_length=100, primary_key=True)
+
+    role = models.CharField(
+        max_length=20,
+        choices=[
+            ("liaison", "Liaison"),
+            ("collecte", "Collecte"),
+        ],
+        default="collecte",
+    )
+
     last_position = models.CharField(max_length=100)
     last_timestamp = models.DateTimeField(null=True, blank=True)
     is_Sat = models.BooleanField(default=False)
@@ -17,7 +27,6 @@ class Station(models.Model):
 
     def __str__(self):
         return self.id_stat
-
 
 class Unit(models.Model):
     desc = models.CharField(max_length=255)
