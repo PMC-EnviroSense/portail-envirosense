@@ -1,211 +1,207 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Connexion - EnviroSense</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connexion - EnviroSense</title>
 
-    body {
-     margin: 0;
-     min-height: 100vh;
-     font-family: Arial, sans-serif;
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-     background: url("{% static 'images/bg-login.png' %}") no-repeat center center;
-     background-size: cover;
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
 
-     display: flex;
-     justify-content: center;
-     align-items: center;
-     position: relative;
-    }
+            background: url("{% static 'images/bg-login.png' %}") no-repeat center center;
+            background-size: cover;
 
-    body::before {
-     content: "";
-     position: absolute;
-     inset: 0;
-     background: rgba(0, 0, 0, 0.15);
-    }
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
 
-    .login-wrapper {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 430px;
-      padding: 20px;
-    }
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.15);
+        }
 
-    .login-card {
-      background: rgba(255, 255, 255, 0.96);
-      border-radius: 26px;
-      padding: 36px 30px 28px;
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
-    }
+        .login-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 430px;
+            padding: 20px;
+        }
 
-    .title {
-      text-align: center;
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0 0 28px;
-      color: #2f2f2f;
-    }
+        .login-card {
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 26px;
+            padding: 36px 30px 28px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+        }
 
-    .subtitle {
-      text-align: center;
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 24px;
-    }
+        .title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 28px;
+            color: #2f2f2f;
+        }
 
-    .form-group {
-      margin-bottom: 16px;
-    }
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 24px;
+        }
 
-    .form-input {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1px solid #d9d9d9;
-      border-radius: 10px;
-      font-size: 15px;
-      outline: none;
-      transition: 0.2s ease;
-      background: #fff;
-    }
+        .form-group {
+            margin-bottom: 16px;
+        }
 
-    .form-input:focus {
-      border-color: #1696f2;
-      box-shadow: 0 0 0 3px rgba(22, 150, 242, 0.15);
-    }
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s ease;
+            background: #fff;
+        }
 
-    .submit-btn {
-      width: 100%;
-      margin-top: 8px;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      background: #1696f2;
-      color: white;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
+        .form-input:focus {
+            border-color: #1696f2;
+            box-shadow: 0 0 0 3px rgba(22, 150, 242, 0.15);
+        }
 
-    .submit-btn:hover {
-      background: #0f80d0;
-    }
+        .submit-btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #1696f2;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
 
-    .extra-links {
-      margin-top: 16px;
-      text-align: center;
-      font-size: 14px;
-      color: #666;
-    }
+        .submit-btn:hover {
+            background: #0f80d0;
+        }
 
-    .extra-links a {
-      color: #1696f2;
-      text-decoration: none;
-      font-weight: 600;
-    }
+        .extra-links {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
 
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 22px 0 18px;
-      color: #999;
-      font-size: 14px;
-    }
+        .extra-links a {
+            color: #1696f2;
+            text-decoration: none;
+            font-weight: 600;
+        }
 
-    .divider::before,
-    .divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: #ddd;
-    }
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 22px 0 18px;
+            color: #999;
+            font-size: 14px;
+        }
 
-    .google-btn {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #bbb;
-      border-radius: 10px;
-      background: #fff;
-      font-size: 15px;
-      color: #333;
-      cursor: not-allowed;
-    }
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #ddd;
+        }
 
-    .error-box {
-      background: #ffe9e9;
-      color: #c62828;
-      border: 1px solid #f5b5b5;
-      padding: 12px 14px;
-      border-radius: 10px;
-      margin-bottom: 16px;
-      font-size: 14px;
-    }
+        .google-btn {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bbb;
+            border-radius: 10px;
+            background: #fff;
+            font-size: 15px;
+            color: #333;
+            cursor: not-allowed;
+        }
 
-    @media (max-width: 480px) {
-      .login-card {
-        padding: 28px 20px 24px;
-      }
+        .error-box {
+            background: #ffe9e9;
+            color: #c62828;
+            border: 1px solid #f5b5b5;
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
 
-      .title {
-        font-size: 1.7rem;
-      }
-    }
-  </style>
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 28px 20px 24px;
+            }
+
+            .title {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <div class="login-wrapper">
-    <div class="login-card">
-      <h1 class="title"> Bienvenue </h1>
-      <div class="subtitle">Connecte-toi à ton espace EnviroSense</div>
+    <div class="login-wrapper">
+        <div class="login-card">
 
-      {% if form.errors %}
-        <div class="error-box">
-          Nom d'utilisateur ou mot de passe incorrect.
+            <h1 class="title">Bienvenue</h1>
+
+            <div class="subtitle">
+                Connecte-toi à ton espace EnviroSense
+            </div>
+
+            {% if form.errors %}
+                <div class="error-box">
+                    Adresse courriel ou mot de passe incorrect.
+                </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    {{ form.username }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.password }}
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Connexion
+                </button>
+            </form>
+
+            <div class="extra-links" style="margin-top: 18px;">
+                Pas encore de compte ?
+                <a href="{% url 'signup' %}">S'inscrire</a>
+            </div>
+
         </div>
-      {% endif %}
-
-      <form method="post">
-        {% csrf_token %}
-
-        <div class="form-group">
-          <input
-            type="text"
-            name="username"
-            class="form-input"
-            placeholder="Nom d'utilisateur"
-            required
-          >
-        </div>
-
-        <div class="form-group">
-          <input
-            type="password"
-            name="password"
-            class="form-input"
-            placeholder="Mot de passe"
-            required
-          >
-        </div>
-
-        <button type="submit" class="submit-btn">Connection</button>
-      </form>
-
-      <div class="extra-links" style="margin-top:18px;">
-        Pas encore de compte ?
-        <a href="{% url 'signup' %}">S'inscrire</a>
-      </div>
-
-   
     </div>
-  </div>
 </body>
 </html>
