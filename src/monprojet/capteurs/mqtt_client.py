@@ -5,7 +5,7 @@ import paho.mqtt.client as mqtt
 from django.conf import settings
 from django.utils import timezone
 
-from .models import Station, Sensor, Data
+from .models import Station, Sensor, Data, MeasurementBatch
 
 
 def _parse_timestamp(ts):
@@ -56,6 +56,62 @@ def _get_or_create_sensor(station, sensor_name, unit="", sensor_type="generic", 
 def _normalize_sensor_name(name):
     return str(name).strip().replace(" ", "_")
 
+def save_measurement_batch(payload):
+    measurements = payload.get("measurements")
+
+    if not isinstance(measurements, dict):
+        return False
+
+    station_id = payload.get("station_id") or payload.get("st_id") or payload.get("src")
+
+    if station_id is None:
+        print("[MQTT] Erreur : station_id manquant")
+        return False
+
+    station = _get_or_create_station(station_id)
+
+    timestamp = _parse_timestamp(
+        payload.get("timestamp") or measurements.get("utc_iso")
+    )
+
+    # Identifiant unique pour éviter les doublons
+    message_id = payload.get("message_id")
+
+    if not message_id:
+        tick_ms = measurements.get("tick_ms")
+
+        if tick_ms is None:
+            print("[MQTT] Erreur : message_id et tick_ms manquants")
+            return False
+
+        message_id = f"CSV-{station_id}-{timestamp.isoformat()}-{tick_ms}"
+
+    # Convertir les champs vides en valeurs nulles
+    cleaned_measurements = {
+        key: None if value == "" else value
+        for key, value in measurements.items()
+    }
+
+    batch, created = MeasurementBatch.objects.get_or_create(
+        station=station,
+        message_id=str(message_id),
+        defaults={
+            "timestamp": timestamp,
+            "measurements": cleaned_measurements,
+        },
+    )
+
+    if created:
+        print(
+            f"[MQTT] MeasurementBatch enregistré : "
+            f"station={station_id}, "
+            f"colonnes={len(cleaned_measurements)}, "
+            f"message_id={message_id}"
+        )
+    else:
+        print(f"[MQTT] Message déjà enregistré : {message_id}")
+
+    return True
 
 def handle_station_payload(payload: dict):
     station_id = payload.get("station_id") or payload.get("st_id") or payload.get("src")
@@ -195,7 +251,8 @@ def on_message(client, userdata, msg):
         return
 
     if topic.endswith("/data"):
-        handle_station_payload(payload)
+        if not save_measurement_batch(payload):
+            handle_station_payload(payload)
 
 
 def create_mqtt_client():

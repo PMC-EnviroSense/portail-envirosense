@@ -76,3 +76,32 @@ class StationCommand(models.Model):
 
     def __str__(self):
         return f"{self.station_id} - {self.command}={self.value}"
+
+
+class MeasurementBatch(models.Model):
+    station = models.ForeignKey(
+        Station,
+        on_delete=models.PROTECT,
+        related_name="measurement_batches"
+    )
+
+    message_id = models.CharField(max_length=100)
+
+    timestamp = models.DateTimeField()
+
+    received_at = models.DateTimeField(auto_now_add=True)
+
+    measurements = models.JSONField(default=dict)
+
+    class Meta:
+        db_table = "measurement_batch"
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["station", "message_id"],
+                name="unique_station_message"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.station_id} - {self.message_id}"
