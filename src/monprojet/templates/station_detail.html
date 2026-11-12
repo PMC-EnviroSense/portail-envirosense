@@ -257,6 +257,39 @@
             background: #1768d9;
         }
 
+        /* ===== SUIVI DE LA COMMANDE DE FREQUENCE ===== */
+        .command-message {
+            margin: 10px 0 0;
+            padding: 8px 12px;
+            border-radius: 7px;
+            font-size: 12px;
+        }
+        .command-success { color: #078954; background: #e5f8ef; }
+        .command-error { color: #d64747; background: #ffeded; }
+        .command-status {
+            margin-top: 12px;
+            display: grid;
+            gap: 6px;
+            color: #44516a;
+            font-size: 12px;
+        }
+        .command-badge {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 650;
+            background: #eef2f7;
+            color: #44516a;
+        }
+        .command-badge.command-sent,
+        .command-badge.command-transmise { background: #fff6e0; color: #a86a00; }
+        .command-badge.command-appliquee { background: #e5f8ef; color: #078954; }
+        .command-badge.command-refusee,
+        .command-badge.command-echec_envoi { background: #ffeded; color: #d64747; }
+        .command-time { color: #8290a5; }
+
         /* ===== TELECHARGEMENT CSV ===== */
         .download-content {
             display: flex;
@@ -282,6 +315,38 @@
 
         .download-button:hover {
             background: #078c5d;
+        }
+
+        .export-dates {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .export-dates label {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            color: #44516a;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .export-dates input {
+            height: 40px;
+            padding: 0 10px;
+            border: 1px solid #d7dee8;
+            border-radius: 7px;
+            color: #17233b;
+            font: inherit;
+            font-weight: 400;
+        }
+
+        .download-button {
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
         }
 
         .download-description {
@@ -459,8 +524,31 @@
         /* ===== HISTORIQUE ===== */
         .history-table-wrapper {
             overflow-x: auto;
+            /* hauteur limitee + barre de defilement verticale (environ 10 lignes visibles) */
+            max-height: 420px;
+            overflow-y: auto;
             border: 1px solid #e6ebf1;
             border-radius: 7px;
+            scrollbar-width: thin;
+            scrollbar-color: #b9c4d3 #f1f4f8;
+        }
+
+        .history-table-wrapper::-webkit-scrollbar {
+            width: 9px;
+            height: 9px;
+        }
+
+        .history-table-wrapper::-webkit-scrollbar-track {
+            background: #f1f4f8;
+        }
+
+        .history-table-wrapper::-webkit-scrollbar-thumb {
+            background: #b9c4d3;
+            border-radius: 999px;
+        }
+
+        .history-table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #8f9db2;
         }
 
         .history-table {
@@ -476,6 +564,12 @@
         .history-table th {
             color: #26344e;
             font-weight: 700;
+            /* en-tete fixe pendant le defilement */
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: #f8fafc;
+            box-shadow: inset 0 -1px 0 #e7ebf0;
         }
 
         .history-table th,
@@ -547,6 +641,7 @@
             }
 
             .download-content,
+            .export-dates,
             .frequency-row {
                 flex-direction: column;
                 align-items: stretch;
@@ -706,28 +801,73 @@
                 <form method="post" action="{% url 'set_interval' station.id_stat %}">
                     {% csrf_token %}
                     <div class="frequency-row">
-                        <input type="number" name="interval" min="1" placeholder="Ex. 20" required>
+                        <input type="number" name="interval" min="{{ interval_min }}" max="{{ interval_max }}"
+                               placeholder="Ex. 20 ({{ interval_min }} à {{ interval_max }} s)" required>
                         <button type="submit" class="apply-button">
                             <i class="fa-solid fa-gear"></i>
                             Appliquer
                         </button>
                     </div>
                 </form>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if 'export' not in message.tags %}
+                            <p class="command-message command-{{ message.level_tag }}">{{ message }}</p>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                <div class="command-status">
+                    <div>
+                        <strong>Période actuelle :</strong>
+                        {% if current_interval %}{{ current_interval }} s{% else %}par défaut (non modifiée){% endif %}
+                    </div>
+                    {% if last_command %}
+                        <div>
+                            <strong>Dernière demande :</strong> {{ last_command.value }} s
+                            <span class="command-badge command-{{ last_command.status }}">{{ last_command_label }}</span>
+                            <span class="command-time">({{ last_command.created_at|date:"d/m/Y H:i:s" }})</span>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
 
             <div class="detail-action-card">
                 <h3>Téléchargement des données</h3>
 
-                <div class="download-content">
-                    <a href="{% url 'export_station_csv' station.id_stat %}" class="download-button">
-                        <i class="fa-solid fa-download"></i>
-                        Download CSV
-                    </a>
+                <form method="get" action="{% url 'export_station_csv' station.id_stat %}" class="export-form">
+                    <div class="export-dates">
+                        <label>
+                            Du
+                            <input type="datetime-local" name="debut" value="{{ export_debut }}" required>
+                        </label>
+                        <label>
+                            Au
+                            <input type="datetime-local" name="fin" value="{{ export_fin }}" required>
+                        </label>
+                    </div>
 
-                    <p class="download-description">
-                        Téléchargez l'historique complet des données de cette station.
-                    </p>
-                </div>
+                    <div class="download-content">
+                        <button type="submit" class="download-button">
+                            <i class="fa-solid fa-download"></i>
+                            Download CSV
+                        </button>
+
+                        <p class="download-description">
+                            Mesures de cette station entre ces deux dates (heure locale).
+                            <a href="{% url 'export_station_csv' station.id_stat %}">Tout l'historique</a>
+                        </p>
+                    </div>
+                </form>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if 'export' in message.tags %}
+                            <p class="command-message command-{{ message.level_tag }}">{{ message }}</p>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             </div>
         </section>
 

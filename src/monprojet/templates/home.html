@@ -96,7 +96,20 @@
         <header class="page-header">
             <h1>Tableau de bord</h1>
             <p>Vue globale des stations environnementales</p>
+            {% if heures_envoi %}
+                <p class="envoi-info">
+                    <i class="fa-regular fa-clock"></i>
+                    Mesures envoyées au site à {% for h in heures_envoi %}{{ h }} h{% if not forloop.last %} et {% endif %}{% endfor %}
+                    {% if prochain_envoi %}· prochain envoi : {{ prochain_envoi|date:"l j F à G \h i" }}{% endif %}
+                </p>
+            {% endif %}
         </header>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="account-message account-{{ message.level_tag }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
 
 
         <!-- CARTE -->

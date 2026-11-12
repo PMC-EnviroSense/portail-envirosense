@@ -1366,3 +1366,21 @@ select {
 .download-description {
     font-size: 15px;
 }
+
+/* Messages du compte (inscription, courriel de confirmation) */
+.account-message {
+    margin: 0 0 18px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+.account-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.account-warning { background: #fff8e1; color: #8d6e00; border: 1px solid #ffe082; }
+.account-error   { background: #ffe9e9; color: #c62828; border: 1px solid #f5b5b5; }
+
+/* Heures d'envoi des mesures (6 h et 18 h) */
+.envoi-info {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #2e7d32;
+}

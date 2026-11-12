@@ -1,0 +1,16 @@
+{% autoescape off %}Bonjour,
+
+Votre compte EnviroSense a bien été créé avec l'adresse {{ email }}.
+
+Vous pouvez vous connecter au portail ici :
+{{ login_url }}
+
+Mot de passe oublié ? Vous pourrez le réinitialiser à tout moment ici :
+{{ reset_url }}
+
+Si vous n'êtes pas à l'origine de cette inscription, vous pouvez ignorer ce courriel.
+
+L'équipe EnviroSense
+
+Ce courriel a été envoyé automatiquement, merci de ne pas y répondre.
+{% endautoescape %}

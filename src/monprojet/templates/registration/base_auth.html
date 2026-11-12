@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}EnviroSense{% endblock %} - EnviroSense</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: url("{% static 'images/bg-login.png' %}") no-repeat center center;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .login-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 430px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 26px;
+            padding: 36px 30px 28px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0 0 18px;
+            color: #2f2f2f;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .form-group { margin-bottom: 16px; }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s ease;
+            background: #fff;
+        }
+
+        .form-input:focus {
+            border-color: #1696f2;
+            box-shadow: 0 0 0 3px rgba(22, 150, 242, 0.15);
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            margin-top: 8px;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #1696f2;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .submit-btn:hover { background: #0f80d0; }
+
+        .extra-links {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .extra-links a {
+            color: #1696f2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .error-box, .field-error {
+            background: #ffe9e9;
+            color: #c62828;
+            border: 1px solid #f5b5b5;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .error-box { margin-bottom: 16px; }
+        .field-error { margin-top: 8px; }
+        .field-error ul, .error-box ul { margin: 0; padding-left: 18px; }
+
+        .success-box {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 480px) {
+            .login-card { padding: 28px 20px 24px; }
+            .title { font-size: 1.55rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

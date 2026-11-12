@@ -11,6 +11,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
+  # Broker MQTT : l'ESP32 publie ici, Django s'abonne ici
+  mosquitto:
+    image: eclipse-mosquitto:2
+    restart: always
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+
   web:
     build: .
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
@@ -22,6 +31,21 @@ services:
       - .env
     depends_on:
       - db
+      - mosquitto
+
+  # Client MQTT Django : recoit les messages et ecrit dans PostgreSQL
+  mqtt:
+    build: .
+    command: python manage.py runmqtt
+    restart: unless-stopped
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - mosquitto
+      - web
 
 volumes:
   postgres_data:

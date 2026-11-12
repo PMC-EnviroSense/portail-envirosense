@@ -87,4 +87,53 @@ MQTT_BROKER_PORT = int(os.getenv("MQTT_BROKER_PORT", "1883"))
 MQTT_USERNAME = os.getenv("MQTT_USERNAME", "")
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "")
 
-TIME_ZONE = 'America/Montreal'
+# ============================================================
+# ENVOI DES MESURES : l'ESP32 envoie les mesures au site 2 fois par jour.
+# Heures locales, separees par des virgules. Doivent etre les memes que
+# HEURES_ENVOI dans esp32_gateway/src/main.cpp. Vide = temps reel.
+# ============================================================
+ENVOI_HEURES = [
+    int(h) for h in os.getenv("ENVOI_HEURES", "6,18").split(",") if h.strip()
+]
+
+# ============================================================
+# COURRIEL (serveur SMTP de l'Universite de Sherbrooke)
+# smtp.usherbrooke.ca, port 25, sans authentification, sans TLS.
+# Chaque valeur peut etre changee dans le fichier .env.
+# Pour tester sans envoyer de vrai courriel (le message s'affiche
+# dans la console du serveur) :
+#   EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+# ============================================================
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.usherbrooke.ca")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "25"))
+EMAIL_HOST_USER = ""        # sans authentification
+EMAIL_HOST_PASSWORD = ""    # sans authentification
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False") == "True"
+EMAIL_USE_SSL = False
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))  # secondes
+
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    "EnviroSense <noreplyenvirosense@usherbrooke.ca>",
+)
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Duree de validite du lien de reinitialisation du mot de passe (24 h)
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24
+
+# Adresse du site a mettre dans les liens des courriels, par exemple
+# SITE_URL=http://192.168.1.50:8000 . Vide = adresse utilisee par le
+# navigateur au moment de la demande (ex. http://127.0.0.1:8000).
+SITE_URL = os.getenv("SITE_URL", "").rstrip("/")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {
+        "capteurs.emails": {"handlers": ["console"], "level": "INFO"},
+    },
+}

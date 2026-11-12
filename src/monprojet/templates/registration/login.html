@@ -114,6 +114,21 @@
             font-weight: 600;
         }
 
+        .forgot-link {
+            text-align: right;
+            margin: -6px 0 10px;
+            font-size: 13px;
+        }
+
+        .forgot-link a {
+            color: #1696f2;
+            text-decoration: none;
+        }
+
+        .forgot-link a:hover {
+            text-decoration: underline;
+        }
+
         .divider {
             display: flex;
             align-items: center;
@@ -189,6 +204,10 @@
 
                 <div class="form-group">
                     {{ form.password }}
+                </div>
+
+                <div class="forgot-link">
+                    <a href="{% url 'password_reset' %}">Mot de passe oublié ?</a>
                 </div>
 
                 <button type="submit" class="submit-btn">
